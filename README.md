@@ -3,8 +3,8 @@
 Clone o repositório:
 
 ```bash
-git clone https://github.com/EdPPF/Net-Communication-Simulator.git
-cd Net-Communication-Simulator
+git clone https://github.com/EdPPF/PyNet-Communication-Simulator.git
+cd PyNet-Communication-Simulator
 ```
 
 TODO
