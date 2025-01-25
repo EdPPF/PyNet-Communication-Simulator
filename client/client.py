@@ -1,35 +1,33 @@
 import socket
-import threading
-from link_layer import *
-import common.constants#.{Host, Port, Type}
+import common.constants
 
-def receive_message(client_socket):
-    while True:
-        try:
-            message = client_socket.recv(1024)
-            if not message:
+def start(host=common.constants.Host, port=common.constants.Port):
+    """Inicia o cliente para enviar mensagens a um servidor."""
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    try:
+        client.connect((host, port))
+        print(f"[INFO] Conectado a {host}:{port}")
+
+        while True:
+            message = input("Digite uma mensagem ou 'sair' para encerrar: ")
+            if message.lower() == "sair":
+                print("[INFO] Encerrando cliente.")
                 break
-            print(f"Received: {message}")
-        except:
-            print("CUUUUUUUUU")
-            break
 
-def main():
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((common.constants.Host, common.constants.Port))
+            # TODO implementat pipeline dos protocolos (enquadramento, detecção/correção de erros e modulação)
 
-    threading.Thread(target=receive_message, args=(client_socket,)).start()
+            # Envia mensagem ao servidor
+            client.send(message.encode("utf-8"))
 
-    while True:
-        message = input("Digite uma mensagem ou 'exit' para sair: ")
-        if message == "exit":
-            break
-        data = [ord(char) for char in message] # Convertendo a mensagem para uma lista de inteiros
-        # Transforma em bytes
-        data = bytes(data)
-        client_socket.sendall(data)
-
-    client_socket.close()
+            # Recebe resposta do servidor
+            response = client.recv(1024).decode("utf-8")
+            print(f"Resposta do servidor: {response}")
+    except Exception as e:
+            print(f"[ERROR] {e}")
+    finally:
+        client.close()
+        print("[INFO] Cliente encerrado.")
 
 if __name__ == "__main__":
-    main()
+    start()
