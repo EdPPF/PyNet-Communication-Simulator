@@ -42,14 +42,10 @@ IP_sim/
 ├── common/                      # Código compartilhado entre cliente e servidor
 │   ├── utils/                   # Utilidades gerais
 │   │   ├── encoding.py          # Funções auxiliares de codificação
-│   │   └── math.py              # Funções matemáticas úteis
 │   ├── communication/           # Sockets
-│   │   ├── socket_client.py
-│   │   ├── socket_server.py
 │   │   └── protocol.py          # Protocolo de comunicação
 │   └── constants.py             # Constantes compartilhadas
 ├── main.py                      # Ponto de entrada da aplicação
-├── go.mod                       # Gerenciamento de dependências do Go
 ├── .gitignore
 └── README.md
 ```
