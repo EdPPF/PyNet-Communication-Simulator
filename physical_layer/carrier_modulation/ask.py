@@ -1,3 +1,5 @@
+"""Modulação por portadora ASK (Amplitude Shift Keying)."""
+
 import math
 
 def ask_modulation(data: list[int], amplitude: float, frequency: float) -> list[float]:
@@ -26,7 +28,7 @@ def ask_demodulation(modulated_signal: list[float], threshold: float) -> list[in
     Se a média dos valores absolutos for maior que o threshold, é interpretado como '1', senão como '0'.
     """
     samples_per_bit = 100
-    demodulated_data = []
+    demodulated_data: list[int] = []
 
     for i in range(0, len(modulated_signal), samples_per_bit):
         segment = modulated_signal[i:i + samples_per_bit]

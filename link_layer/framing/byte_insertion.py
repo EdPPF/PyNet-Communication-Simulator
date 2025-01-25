@@ -1,3 +1,5 @@
+"""Protocolo de enquadramento por inserção de bytes."""
+
 import common.constants
 
 ESC = common.constants.ESC

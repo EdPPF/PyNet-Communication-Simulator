@@ -1,3 +1,5 @@
+"""Modulação por portadora FSK (Frequency Shift Keying)."""
+
 import math
 
 def fsk_modulation(data: list[int], amplitude: float, freq0: float, freq1: float) -> list[float]:

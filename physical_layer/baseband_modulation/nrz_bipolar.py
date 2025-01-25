@@ -1,3 +1,5 @@
+"""Modulação banda base NRZ Bipolar."""
+
 def bipolar_nrz(data: list[int]) -> list[int]:
     """
     Aplica a modulação NRZ Bipolar aos dados.\n

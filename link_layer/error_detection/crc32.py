@@ -1,7 +1,9 @@
+"""Protocolo de detcção de erro por CRC32."""
+
 import common.constants
 
 # CRC32 precomputed table (used for faster computation)
-_crc32_table = None
+CRC32_TABLE = [0]*256
 
 def init():
     """Precomputes the CRC32 table using the polynomial 0x04C11DB7 (non-reflected)."""
@@ -18,27 +20,35 @@ def init():
 
 def compute_crc32(data: bytes) -> int:
     """Calculates the CRC32 checksum for a sequence of bytes."""
-    global _crc32_table
-    if _crc32_table is None:
+    global CRC32_TABLE
+    if CRC32_TABLE == []:
         init()
 
     crc = 0xFFFFFFFF  # Initialize CRC with all bits set according to IEEE 802.3
     for byte in data:
         table_index = ((crc >> 24) ^ byte) & 0xFF  # Index into the CRC32 table. Usa o byte mais significativo
-        crc = (crc << 8) ^ _crc32_table[table_index]
+        crc = (crc << 8) ^ CRC32_TABLE[table_index]
     return crc & 0xFFFFFFFF
 
-def append_crc32(data: bytes):
+def append_crc32(data: list[int]) -> list[int]:
     """Appends the CRC32 checksum to the data."""
-    crc = compute_crc32(data)
-    crc_bytes = crc.to_bytes(4, byteorder='big')  # Convert CRC to 4 bytes in big-endian order
-    return data + list(crc_bytes) # Append the CRC bytes to the data
+    # Converte a lista de int para bytes
+    datab = bytes(data)
+    crc = compute_crc32(datab)
+    crc_bytes = list(crc.to_bytes(4, byteorder='big'))  # Convert CRC to 4 bytes in big-endian order
+    return list(datab) + crc_bytes # Append the CRC bytes to the data
 
-def verify_crc32(dataWithCRC: bytes) -> bool:
+def verify_crc32(dataWithCRC: list[int]) -> tuple[list[int], bool]:
     """Verifies if the CRC32 checksum in the data is correct."""
+    # Converte para bytes
     if len(dataWithCRC) < 4:
         return False  # Not enough data to include a CRC
-    data = dataWithCRC[:-4]  # Extract original data (excluding the last 4 CRC bytes)
-    received_crc = int.from_bytes(dataWithCRC[-4:], byteorder='big')  # Extract CRC
+    dataWithCRCBytes = bytes(dataWithCRC)
+    data = dataWithCRCBytes[:-4]  # Extract original data (excluding the last 4 CRC bytes)
+    received_crc = int.from_bytes(dataWithCRCBytes[-4:], byteorder='big')  # Extract CRC
     computed_crc = compute_crc32(data)
-    return data, computed_crc == received_crc
+    # Verifica se o CRC recebido corresponde ao recalculado
+    is_valid = (received_crc == computed_crc)
+    # Converte os dados originais de volta para list[int]
+    data_list = list(data)
+    return data_list, is_valid

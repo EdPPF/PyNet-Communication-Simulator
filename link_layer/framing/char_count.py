@@ -1,3 +1,5 @@
+"""Protocolo de enquadramento por contagem de caracteres."""
+
 def char_count(frame: list[int])-> list[int]:
     """Conta o número de caracteres em uma mensagem e adiciona no início da mensagem."""
     if len(frame) > 255:

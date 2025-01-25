@@ -1,3 +1,5 @@
+"""Modulação banda base Manchester."""
+
 def manchester(data: list[int]) -> list[int]:
     """
     Aplica a modulação Manchester aos dados.\n

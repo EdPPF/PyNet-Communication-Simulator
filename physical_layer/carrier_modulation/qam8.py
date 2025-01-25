@@ -1,3 +1,5 @@
+"""Modulação por portadora QAM-8 (Quadrature Amplitude Modulation)."""
+
 import math
 
 def qam8_modulation(data: list[int], amplitude: float, frequency: float) -> list[tuple[float, float]]:
@@ -34,7 +36,7 @@ def qam8_modulation(data: list[int], amplitude: float, frequency: float) -> list
 
     return modulated_signal
 
-def qam8_demodulation(modulated_signal: list[float], amplitude: float, frequency: float) -> list[int]:
+def qam8_demodulation(modulated_signal: list[float], amplitude: float) -> list[int]:
     """
     Demodula um sinal QAM-8.\n
     Analisa amplitude e fase para identificar os três bits originais.

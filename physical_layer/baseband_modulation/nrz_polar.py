@@ -1,3 +1,5 @@
+"""Modulação banda base por NRZ Polar."""
+
 def polar_nrz(data: list[int]) -> list[int]:
     """
     Aplica a modulação NRZ Polar aos dados.\n
