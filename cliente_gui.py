@@ -8,23 +8,30 @@ def criar_janela_principal():
 
     # Criação do campo de entrada de texto
 
-    entry_label = tk.Label(root, text="Digite uma mensagem ou 'sair' para encerrar: ")
-    entry_label.pack(pady=10)
-
-    entry = tk.Entry(root)
-    entry.pack(pady=10)
-
-    # Função que é chamada quando o botão "Enviar" é pressionado
-    def enviar_dados():
-        dado = entry.get()  # Pega o dado digitado
-        return dado
-        #exibir_segunda_janela(dado)  # Chama a função que exibe a segunda janela
-
-    # Criação do botão "Enviar"
-    button = tk.Button(root, text="Enviar", command=enviar_dados)
-    button.pack(pady=20)
     
     # Iniciar o loop da interface gráfica
-    root.mainloop()
-def fechar_janela(): 
+    #root.mainloop()
+    return root
+
+def fechar_janela(root): 
     root.destroy()
+
+def enviar_dados(root):
+    dado = tk.StringVar()  # Variável especial do Tkinter
+
+    entry_label = tk.Label(root, text="Digite uma mensagem ou 'sair' para encerrar: ")
+    entry_label.pack(pady=10) 
+
+    caixa_texto = tk.Entry(root, width=30)
+    caixa_texto.pack(pady=10)
+
+    def pegar_texto():
+        texto=caixa_texto.get()
+        return texto
+    
+
+    # Botão para enviar os dados
+    button = tk.Button(root, text="Enviar", command=pegar_texto)
+    button.pack(pady=20)
+    return pegar_texto
+
