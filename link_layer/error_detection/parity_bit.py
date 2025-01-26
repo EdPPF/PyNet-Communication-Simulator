@@ -8,20 +8,31 @@ def compute_parity_bit(frame: list[int]) -> list[int]:
 
 def verify_parity_bit(frame: list[int]) -> tuple[list[int], bool]:
     """Verifica se o bit de paridade em um frame está correto."""
-    # Converte list[int] para str binária
-    frame_str = ''.join(map(str, frame))
-
     # Verifica o último bit (bit de paridade)
-    data = frame_str[:-1]
-    parity_bit = int(frame_str[-1])
+    data = frame[:-1]
+    parity_bit = frame[-1]
 
     # Calcula a paridade dos bits de dados
-    computed_parity = sum(int(bit) for bit in data) % 2
+    computed_parity = sum(bit for bit in data) % 2
 
     # Verifica se a paridade calculada corresponde ao bit de paridade
     is_valid = (computed_parity == parity_bit)
 
-    # Converte os dados de volta para list[int]
-    data_list = list(map(int, data))
+    return data, is_valid
 
-    return data_list, is_valid
+
+def main():
+    message = "hi" # [2, 104, 105, 3] por byte insertion
+    data = [2, 104, 105, 3]
+    print(f"Original Data: {data}")
+    framed_data = compute_parity_bit(data)
+    print(f"Framed Data  : {framed_data}")
+
+    data, is_valid = verify_parity_bit(framed_data)
+    print(f"Unframed Data: {data}")
+    message = "".join([chr(byte) for byte in data])
+    print(f"Message      : {message}")
+    print(f"Is Valid     : {is_valid}")
+
+if __name__ == "__main__":
+    main()

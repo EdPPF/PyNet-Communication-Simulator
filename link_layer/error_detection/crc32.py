@@ -1,6 +1,6 @@
 """Protocolo de detcção de erro por CRC32."""
 
-import common.constants
+# import common.constants
 
 # CRC32 precomputed table (used for faster computation)
 CRC32_TABLE = [0]*256
@@ -8,7 +8,7 @@ CRC32_TABLE = [0]*256
 def init():
     """Precomputes the CRC32 table using the polynomial 0x04C11DB7 (non-reflected)."""
     global CRC32_TABLE
-    polynomial = common.constants.CRC32_POLYNOMIAL
+    polynomial = 0x04C11DB7 # common.constants.CRC32_POLYNOMIAL
     for i in range(256):
         crc = i << 24  # Start with the byte in the most significant position
         for _ in range(8):
@@ -52,3 +52,21 @@ def verify_crc32(dataWithCRC: list[int]) -> tuple[list[int], bool]:
     # Converte os dados originais de volta para list[int]
     data_list = list(data)
     return data_list, is_valid
+
+
+def main():
+    message = "hi" # [2, 104, 105, 3] por byte insertion
+    data = [2, 104, 105, 3]
+    print(f"Original Data: {data}")
+    framed_data = append_crc32(data)
+    print(f"Framed Data  : {framed_data}")
+
+    data, is_valid = verify_crc32(framed_data)
+    print(f"Unframed Data: {data}")
+    message = "".join([chr(byte) for byte in data])
+    print(f"Message      : {message}")
+    print(f"Is Valid     : {is_valid}")
+
+
+if __name__ == "__main__":
+    main()

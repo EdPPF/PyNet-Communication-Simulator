@@ -1,10 +1,13 @@
 """Protocolo de enquadramento por inserção de bytes."""
 
-import common.constants
+# import common.constants
 
-ESC = common.constants.ESC
-STX = common.constants.STX
-ETX = common.constants.ETX
+# ESC = common.constants.ESC
+# STX = common.constants.STX
+# ETX = common.constants.ETX
+STX = 0x02 # Start of Text
+ETX = 0x03 # End of Text
+ESC = 0x1B # Escape
 
 def byte_insertion(data: list[int]) -> list[int]:
     """Aplica Byte Insertion em uma sequência de bytes.\n
@@ -33,3 +36,22 @@ def byte_removal(framed_data: list[int]) -> list[int]:
         else:
             data.append(byte)
     return data
+
+
+
+def main():
+    message = "hi"
+    data = [ord(char) for char in message]
+    print(f"Original Data: {data}")
+    framed_data = byte_insertion(data)
+    print(f"Framed Data  : {framed_data}")
+
+    data = byte_removal(framed_data)
+    print(f"Unframed Data: {data}")
+    message = "".join([chr(byte) for byte in data])
+    print(f"Message      : {message}")
+
+if __name__ == "__main__":
+    main()
+
+

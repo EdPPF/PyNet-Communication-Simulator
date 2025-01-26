@@ -1,6 +1,7 @@
 import socket
 import threading
 import common.constants
+from common.conversions import bytes_to_bits, bits_to_bytes
 
 from link_layer.framing.byte_insertion import byte_insertion
 from link_layer.framing.char_count import char_count
@@ -16,7 +17,13 @@ from physical_layer.carrier_modulation.fsk import fsk_modulation
 from physical_layer.carrier_modulation.qam8 import qam8_modulation
 
 
+def fragment_message(message: str, frame_size: int) -> list[str]:
+    """Divide a mensagem em pedaços menores (quadros)."""
+    return [message[i:i + frame_size] for i in range(0, len(message), frame_size)]
+
+
 def process_message(message: str):
+    """Enquadra uma mensagem e envia um quadro de cada vez ao servidor, aplicando os protocolos necessários."""
     # Modifica message para list[int] para aplicar enquadramento
     data = [ord(char) for char in message]
 
@@ -54,11 +61,12 @@ def process_message(message: str):
         else:
             print("Escolha inválida. Por favor, escolha novamente.")
     # error_checked_message: list[int]
-    print(f"error_checked_message: {error_checked_message}")
+
+    bits = bytes_to_bits(error_checked_message)
 
     # 3. Correção de erros - Hamming(7,4)
-    encoded_message = encode_hamming(error_checked_message)
-    # encoded_message: list[int]
+    encoded_message = encode_hamming(bits)
+    # encoded_message: list[int] lista de BINÁRIOS bem grande
 
     # 4. Modulação Banda Base
     while True:
@@ -122,7 +130,8 @@ def process_message(message: str):
         "f0": freq0,  # Frequência para '0' em FSK
         "f1": freq1,  # Frequência para '1' em FSK
     }
-    return modulated_message, protocol_config
+    # return modulated_message, protocol_config
+    return encoded_message, protocol_config # Testando sem modulação
 
 
 def start(host=common.constants.Host, port=common.constants.Port):
@@ -139,10 +148,21 @@ def start(host=common.constants.Host, port=common.constants.Port):
                 print("[INFO] Encerrando cliente.")
                 break
 
-            # Processa a mensagem com os protocolos
-            processed_message, protocol_config = process_message(message)
-            # Envia mensagem ao servidor
-            client.sendall(str((processed_message, protocol_config)).encode())
+            # Divide a mensagem:
+            parts = fragment_message(message, 4)
+            num_parts = len(parts)
+            # Envia o número de partes
+            client.sendall(str(num_parts).encode())
+
+            # Para cada parte da mensagem:
+            for part in parts:
+                # Processa a parte com os protocolos
+                processed_message, protocol_config = process_message(part)
+                # Envia mensagem ao servidor
+                client.sendall(str((processed_message, protocol_config)).encode())
+                # Recebe resposta do servidor
+                response = client.recv(1024).decode()
+                print(f"Resposta sobre a parte: {response}")
 
             # Recebe resposta do servidor
             response = client.recv(1024).decode()

@@ -1,6 +1,7 @@
 import socket
 import threading
 import common.constants
+from common.conversions import bytes_to_bits, bits_to_bytes, bytes_to_str
 
 from link_layer.framing.byte_insertion import byte_removal
 from link_layer.framing.char_count import char_remove
@@ -20,68 +21,85 @@ def handle_client(client_socket, address):
     print(f"[INFO] Conexão estabelecida com {address}")
     try:
         while True:
+            # Recebe a quantidade de partes
+            num_parts = int(client_socket.recv(1024).decode())
+            print(f"[INFO] Quantidade de partes chegando: {num_parts}")
+            received_parts = []
+
+            for _ in range(num_parts):
             # Recebe mensagem do cliente
-            message = client_socket.recv(4194304).decode()
-            if not message:
-                break
-            print(f"Sinal recebido.")
+                message = client_socket.recv(1024).decode()
+                if not message:
+                    break
 
-            modulated_data, protocol_config = eval(message) # Deserializa a mensagem
-            # modulated_data: list[float]
+                modulated_data, protocol_config = eval(message) # Deserializa a mensagem
+                # modulated_data: list[float]
 
-            # 1. Undo modulação de portadora
-            if protocol_config["carrier"] == "ask":
-                baseband_data = ask_demodulation(modulated_data, protocol_config["threshold"])
-            elif protocol_config["carrier"] == "fsk":
-                baseband_data = fsk_demodulation(modulated_data, protocol_config["f0"], protocol_config["f1"], protocol_config["threshold"])
-            elif protocol_config["carrier"] == "qam8":
-                baseband_data = qam8_demodulation(modulated_data, protocol_config["amplitude"])
-            # baseband_data: list[int]
+                ''' Testando sem modulação
+                # 1. Undo modulação de portadora
+                if protocol_config["carrier"] == "ask":
+                    baseband_data = ask_demodulation(modulated_data, protocol_config["threshold"])
+                elif protocol_config["carrier"] == "fsk":
+                    baseband_data = fsk_demodulation(modulated_data, protocol_config["f0"], protocol_config["f1"], protocol_config["threshold"])
+                elif protocol_config["carrier"] == "qam8":
+                    baseband_data = qam8_demodulation(modulated_data, protocol_config["amplitude"])
+                # baseband_data: list[int]
 
-            # 2. Undo modulação de banda base
-            if protocol_config["baseband"] == "polar_nrz":
-                data = demodulate_polar_nrz(baseband_data)
-                print("NRZ Polar OK")
-            elif protocol_config["baseband"] == "bipolar_nrz":
-                data = demodulate_bipolar_nrz(baseband_data)
-            elif protocol_config["baseband"] == "manchester":
-                data = demodulate_manchester(baseband_data)
-            # data: list[int]
+                # 2. Undo modulação de banda base
+                if protocol_config["baseband"] == "polar_nrz":
+                    data = demodulate_polar_nrz(baseband_data)
+                elif protocol_config["baseband"] == "bipolar_nrz":
+                    data = demodulate_bipolar_nrz(baseband_data)
+                elif protocol_config["baseband"] == "manchester":
+                    data = demodulate_manchester(baseband_data)
+                # data: list[int]
+                '''
+                data = modulated_data
+                # 3. Desfaz Hamming
+                error_checked_message = decode_hamming(data)
+                # error_checked_message: list[int]
 
-            # 3. Desfaz Hamming
-            error_checked_message = decode_hamming(data)
-            print("Hamming OK")
-            # error_checked_message: list[int]
+                error_checked_message = bits_to_bytes(error_checked_message)
 
-            # 4. Verifica detecção de erros
-            if protocol_config["error_detection"] == "parity_bit":
-                verified, is_valid = verify_parity_bit(error_checked_message)
-            elif protocol_config["error_detection"] == "crc32":
-                verified, is_valid = verify_crc32(error_checked_message)
-                print("CRC32 OK")
-            if not verified:
-                print("[ERROR] Erro detectado na mensagem recebida.")
-                client_socket.send("Erro detectado na mensagem recebida.".encode("utf-8"))
-                continue
-            if not is_valid:
-                print("[ERROR] Mensagem corrompida.")
-                client_socket.send("Mensagem corrompida.".encode("utf-8"))
-                continue
-            # verified: list[int]
+                # 4. Verifica detecção de erros
+                if protocol_config["error_detection"] == "parity_bit":
+                    verified, is_valid = verify_parity_bit(error_checked_message)
+                elif protocol_config["error_detection"] == "crc32":
+                    verified, is_valid = verify_crc32(error_checked_message)
+                if not verified:
+                    print("[ERROR] Erro detectado na mensagem recebida.")
+                    client_socket.send("Erro detectado na mensagem recebida.".encode("utf-8"))
+                    continue
+                if not is_valid:
+                    print("[ERROR] Mensagem corrompida.")
+                    client_socket.send("Mensagem corrompida.".encode("utf-8"))
+                    continue
+                # verified: list[int]
 
-            # 5. Desfaz enquadramento
-            if protocol_config["framing"] == "byte_insertion":
-                message = byte_removal(error_checked_message)
-            elif protocol_config["framing"] == "char_count":
-                message = char_remove(error_checked_message)
-                print("Char Count OK")
+                # print(f"PÓS HAMMING: {error_checked_message}")
+                # print(f"VERIFIED: {verified}")
+                # 5. Desfaz enquadramento
+                if protocol_config["framing"] == "byte_insertion":
+                    message = byte_removal(verified)
+                elif protocol_config["framing"] == "char_count":
+                    message = char_remove(verified)
 
-            # TODO converter a mensagem para string
-            # Imprime a mensagem recebida
-            print(f"Mensagem recebida de {address}: {message}")
-
-            # Envia resposta ao cliente
-            client_socket.send("Mensagem recebida!".encode("utf-8"))
+                # Converte a mensagem para string
+                message = bytes_to_str(message)
+                print(f"Parte recebida de {address}: {message}")
+                # Adiciona a parte recebida à lista de partes
+                received_parts.append(message)
+                # Envia resposta ao cliente
+                client_socket.send("Parte recebida!".encode("utf-8"))
+            # Envia confirmação final ao cliente
+            client_socket.send("Todos os quadros recebidos.".encode("utf-8"))
+            print(f"[INFO] Todas as partes recebidas de {address}")
+            # Junta as partes na mensagem completa
+            full_message = ""
+            for part in received_parts:
+                full_message += part
+            print(f"Mensagem completa de {address}: {full_message}")
+            break
     except Exception as e:
         print(f"[ERROR] ao lidar com cliente: {e}")
         client_socket.send("Erro ao lidar com a mensagem.".encode("utf-8"))

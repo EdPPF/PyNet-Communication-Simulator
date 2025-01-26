@@ -8,7 +8,7 @@ def fsk_modulation(data: list[int], amplitude: float, freq0: float, freq1: float
     Para '0', utiliza uma frequência `freq0`.\n
     Para '1', utiliza uma frequência `freq1`.
     """
-    samples_per_bit = 100
+    samples_per_bit = 20
     modulated_signal = []
 
     for bit in data:
@@ -25,7 +25,7 @@ def fsk_demodulation(modulated_signal: list[float], freq0: float, freq1: float, 
     Demodula um sinal FSK.\n
     Calcula a energia em cada segmento para determinar se corresponde a freq0 ou freq1.
     """
-    samples_per_bit = 100
+    samples_per_bit = 20
     demodulated_data = []
 
     for i in range(0, len(modulated_signal), samples_per_bit):
