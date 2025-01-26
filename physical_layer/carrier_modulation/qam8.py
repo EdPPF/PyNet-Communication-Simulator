@@ -10,7 +10,7 @@ def qam8_modulation(data: list[int], amplitude: float, frequency: float) -> list
     if len(data) % 3 != 0:
         raise ValueError("A entrada precisa ter múltiplos de 3 bits para QAM-8.")
 
-    samples_per_symbol = 100
+    samples_per_symbol = 20
     modulated_signal = []
 
     # Tabela de mapeamento para QAM-8
@@ -41,7 +41,7 @@ def qam8_demodulation(modulated_signal: list[float], amplitude: float) -> list[i
     Demodula um sinal QAM-8.\n
     Analisa amplitude e fase para identificar os três bits originais.
     """
-    samples_per_symbol = 100
+    samples_per_symbol = 20
     num_symbols = len(modulated_signal) // samples_per_symbol
     demodulated_bits = []
 

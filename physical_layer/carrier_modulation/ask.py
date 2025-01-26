@@ -8,7 +8,7 @@ def ask_modulation(data: list[int], amplitude: float, frequency: float) -> list[
     Para '1', gera um sinal senoidal com amplitude especificada.\n
     Para '0', gera um sinal nulo.
     """
-    samples_per_bit = 100  # Número de pontos para amostrar cada bit
+    samples_per_bit = 20  # Número de pontos para amostrar cada bit
     modulated_signal = []
 
     for bit in data:
@@ -27,7 +27,7 @@ def ask_demodulation(modulated_signal: list[float], threshold: float) -> list[in
     Demodula um sinal ASK.\n
     Se a média dos valores absolutos for maior que o threshold, é interpretado como '1', senão como '0'.
     """
-    samples_per_bit = 100
+    samples_per_bit = 20
     demodulated_data: list[int] = []
 
     for i in range(0, len(modulated_signal), samples_per_bit):

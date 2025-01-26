@@ -26,13 +26,10 @@ def handle_client(client_socket, address):
             if not message:
                 break
             print(f"Sinal recebido.")
+            print(message)
 
             modulated_data, protocol_config = eval(message) # Deserializa a mensagem
             # modulated_data: list[float]
-
-            print(modulated_data)
-
-            modulated_data = bytes_to_bits(modulated_data)
 
             # 1. Undo modulação de portadora
             if protocol_config["carrier"] == "ask":
@@ -43,8 +40,6 @@ def handle_client(client_socket, address):
                 baseband_data = qam8_demodulation(modulated_data, protocol_config["amplitude"])
             # baseband_data: list[int]
 
-            print(baseband_data)
-
             # 2. Undo modulação de banda base
             if protocol_config["baseband"] == "polar_nrz":
                 data = demodulate_polar_nrz(baseband_data)
@@ -54,14 +49,9 @@ def handle_client(client_socket, address):
                 data = demodulate_manchester(baseband_data)
             # data: list[int]
 
-            print(data)
-
             # 3. Desfaz Hamming
             error_checked_message = decode_hamming(data)
-            print("Hamming OK")
             # error_checked_message: list[int]
-
-            print(error_checked_message)
 
             error_checked_message = bits_to_bytes(error_checked_message)
 
