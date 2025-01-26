@@ -36,22 +36,3 @@ def byte_removal(framed_data: list[int]) -> list[int]:
         else:
             data.append(byte)
     return data
-
-
-
-def main():
-    message = "hi"
-    data = [ord(char) for char in message]
-    print(f"Original Data: {data}")
-    framed_data = byte_insertion(data)
-    print(f"Framed Data  : {framed_data}")
-
-    data = byte_removal(framed_data)
-    print(f"Unframed Data: {data}")
-    message = "".join([chr(byte) for byte in data])
-    print(f"Message      : {message}")
-
-if __name__ == "__main__":
-    main()
-
-

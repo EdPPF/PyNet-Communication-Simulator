@@ -28,14 +28,14 @@ def handle_client(client_socket, address):
 
             for _ in range(num_parts):
             # Recebe mensagem do cliente
-                message = client_socket.recv(1024).decode()
+                message = client_socket.recv(8192).decode()
                 if not message:
                     break
 
                 modulated_data, protocol_config = eval(message) # Deserializa a mensagem
                 # modulated_data: list[float]
 
-                ''' Testando sem modulação
+                ''' Testando sem modulação por portadora
                 # 1. Undo modulação de portadora
                 if protocol_config["carrier"] == "ask":
                     baseband_data = ask_demodulation(modulated_data, protocol_config["threshold"])
@@ -43,8 +43,9 @@ def handle_client(client_socket, address):
                     baseband_data = fsk_demodulation(modulated_data, protocol_config["f0"], protocol_config["f1"], protocol_config["threshold"])
                 elif protocol_config["carrier"] == "qam8":
                     baseband_data = qam8_demodulation(modulated_data, protocol_config["amplitude"])
-                # baseband_data: list[int]
+                '''
 
+                baseband_data = modulated_data
                 # 2. Undo modulação de banda base
                 if protocol_config["baseband"] == "polar_nrz":
                     data = demodulate_polar_nrz(baseband_data)
@@ -52,9 +53,8 @@ def handle_client(client_socket, address):
                     data = demodulate_bipolar_nrz(baseband_data)
                 elif protocol_config["baseband"] == "manchester":
                     data = demodulate_manchester(baseband_data)
-                # data: list[int]
-                '''
-                data = modulated_data
+                # data: list[int] de 0, 1 e -1
+
                 # 3. Desfaz Hamming
                 error_checked_message = decode_hamming(data)
                 # error_checked_message: list[int]
@@ -90,7 +90,7 @@ def handle_client(client_socket, address):
                 # Adiciona a parte recebida à lista de partes
                 received_parts.append(message)
                 # Envia resposta ao cliente
-                client_socket.send("Parte recebida!".encode("utf-8"))
+                client_socket.send("Parte recebida!\n".encode("utf-8"))
             # Envia confirmação final ao cliente
             client_socket.send("Todos os quadros recebidos.".encode("utf-8"))
             print(f"[INFO] Todas as partes recebidas de {address}")

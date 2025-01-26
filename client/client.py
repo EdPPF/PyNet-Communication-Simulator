@@ -75,19 +75,20 @@ def process_message(message: str):
             print(f"{choice}")
         baseband_choice = int(input("-> "))
         if baseband_choice == 1:
-            modulated_message = polar_nrz(encoded_message)
+            baseband_message = polar_nrz(encoded_message)
             baseband_protocol = "polar_nrz"
             break
         elif baseband_choice == 2:
-            modulated_message = bipolar_nrz(encoded_message)
+            baseband_message = bipolar_nrz(encoded_message)
             baseband_protocol = "bipolar_nrz"
             break
         elif baseband_choice == 3:
-            modulated_message = manchester(encoded_message)
+            baseband_message = manchester(encoded_message)
             baseband_protocol = "manchester"
             break
         else:
             print("Escolha inválida. Por favor, escolha novamente.")
+    # baseband_message é uma lista de 1, 0 e -1 grande
 
     # 5. Modulação de Portadora
     freq0 = 0
@@ -100,20 +101,20 @@ def process_message(message: str):
         if carrier_choice == 1:
             amplitude = float(input("Digite a amplitude da onda portadora: "))
             frequency = float(input("Digite a frequência da onda portadora: "))
-            modulated_message = ask_modulation(modulated_message, amplitude, frequency)
+            modulated_message = ask_modulation(baseband_message, amplitude, frequency)
             carrier_protocol = "ask"
             break
         elif carrier_choice == 2:
             amplitude = float(input("Digite a amplitude da onda portadora: "))
             freq0 = float(input("Digite a frequência da onda portadora para '0': "))
             freq1 = float(input("Digite a frequência da onda portadora para '1': "))
-            modulated_message = fsk_modulation(modulated_message, amplitude, freq0, freq1)
+            modulated_message = fsk_modulation(baseband_message, amplitude, freq0, freq1)
             carrier_protocol = "fsk"
             break
         elif carrier_choice == 3:
             amplitude = float(input("Digite a amplitude da onda portadora: "))
             frequency = float(input("Digite a frequência da onda portadora: "))
-            modulated_message = qam8_modulation(modulated_message, amplitude, frequency)
+            modulated_message = qam8_modulation(baseband_message, amplitude, frequency)
             carrier_protocol = "qam8"
             break
         else:
@@ -131,7 +132,7 @@ def process_message(message: str):
         "f1": freq1,  # Frequência para '1' em FSK
     }
     # return modulated_message, protocol_config
-    return encoded_message, protocol_config # Testando sem modulação
+    return baseband_message, protocol_config # Testando sem modulação
 
 
 def start(host=common.constants.Host, port=common.constants.Port):
