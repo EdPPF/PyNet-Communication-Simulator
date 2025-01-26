@@ -18,6 +18,8 @@ from physical_layer.carrier_modulation.qam8 import qam8_modulation
 
 import tkinter as tk
 from cliente_gui import criar_janela_principal
+from cliente_gui import fechar_janela
+from cliente_gui import enviar_dados
 
 def fragment_message(message: str, frame_size: int) -> list[str]:
     """Divide a mensagem em pedaços menores (quadros)."""
@@ -140,16 +142,19 @@ def start(host=common.constants.Host, port=common.constants.Port):
     """Inicia o cliente para enviar mensagens a um servidor."""
 
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
+    raiz = criar_janela_principal()
+    message = enviar_dados(raiz)
+    print(message)
     try:
-        criar_janela_principal()
         client.connect((host, port))
-        print(f"[INFO] Conectado a {host}:{port}")
+        #print(f"[INFO] Conectado a {host}:{port}")
 
         while True:
-            message = input("Digite uma mensagem ou 'sair' para encerrar: ")
+            #message = input("Digite uma mensagem ou 'sair' para encerrar: ")
+            
             if message.lower() == "sair":
-                print("[INFO] Encerrando cliente.")
+                fechar_janela(raiz)
+                #print("[INFO] Encerrando cliente.")
                 break
 
             # Divide a mensagem:
