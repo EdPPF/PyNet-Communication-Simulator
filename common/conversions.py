@@ -17,3 +17,7 @@ def bytes_to_bits(byte_array):
         # Extend the bits list with the bits from the binary representation
         bits.extend(int(bit) for bit in binary_representation)
     return bits
+
+# Transforma bytes numa lista em seus caracteres correspondentes. Ex.: [104, 105] -> "hi"
+def bytes_to_str(byte_array):
+    return "".join([chr(byte) for byte in byte_array])
