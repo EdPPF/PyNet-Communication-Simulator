@@ -16,6 +16,8 @@ from physical_layer.carrier_modulation.ask import ask_modulation
 from physical_layer.carrier_modulation.fsk import fsk_modulation
 from physical_layer.carrier_modulation.qam8 import qam8_modulation
 
+import tkinter as tk
+from cliente_gui import criar_janela_principal
 
 def fragment_message(message: str, frame_size: int) -> list[str]:
     """Divide a mensagem em pedaços menores (quadros)."""
@@ -136,9 +138,11 @@ def process_message(message: str):
 
 def start(host=common.constants.Host, port=common.constants.Port):
     """Inicia o cliente para enviar mensagens a um servidor."""
+
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     try:
+        criar_janela_principal()
         client.connect((host, port))
         print(f"[INFO] Conectado a {host}:{port}")
 
