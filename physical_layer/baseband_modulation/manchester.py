@@ -31,20 +31,3 @@ def demodulate_manchester(modulated_data: list[int]) -> list[int]:
         else:
             raise ValueError(f"Codificação Manchester inválida detectada.")
     return demodulated_data
-
-
-def main():
-    # Valores pós workflow até hamming
-    Original_Data = [2, 104, 105, 3, 0, 0, 0, 0] # hi + byte insertion + crc32
-    Binary_Data   = [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    Hamming_Data  = [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    Length        = 112
-
-    modulated_data = manchester(Hamming_Data)
-    print(f"Dados modulados: {modulated_data}")
-
-    demodulated_data = demodulate_manchester(modulated_data)
-    print(f"Dados demodulados: {demodulated_data == Hamming_Data}")
-
-if __name__ == "__main__":
-    main()

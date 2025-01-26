@@ -7,7 +7,11 @@ git clone https://github.com/EdPPF/PyNet-Communication-Simulator.git
 cd PyNet-Communication-Simulator
 ```
 
-TODO
+Rode o programa a partir do ponto de entrada da aplicação:
+
+```bash
+python3 main.py
+```
 
 ## Estrutura do Repositório
 
@@ -40,10 +44,7 @@ IP_sim/
 │   │   ├── fsk.py               # Modulação FSK
 │   │   └── qam_8.py             # Modulação 8-QAM
 ├── common/                      # Código compartilhado entre cliente e servidor
-│   ├── utils/                   # Utilidades gerais
-│   │   ├── encoding.py          # Funções auxiliares de codificação
-│   ├── communication/           # Sockets
-│   │   └── protocol.py          # Protocolo de comunicação
+│   ├── conversions.py           # Funções auxiliares de conversão
 │   └── constants.py             # Constantes compartilhadas
 ├── main.py                      # Ponto de entrada da aplicação
 ├── .gitignore
