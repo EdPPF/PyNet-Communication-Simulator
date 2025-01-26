@@ -16,6 +16,9 @@ from physical_layer.carrier_modulation.ask import ask_demodulation
 from physical_layer.carrier_modulation.fsk import fsk_demodulation
 from physical_layer.carrier_modulation.qam8 import qam8_demodulation
 
+import tkinter as tk
+from servidor_gui import exibir_segunda_janela
+
 def handle_client(client_socket, address):
     """Lida com comunicação com um cliente."""
     print(f"[INFO] Conexão estabelecida com {address}")
@@ -110,10 +113,12 @@ def handle_client(client_socket, address):
 
 def start(host=common.constants.Host, port=common.constants.Port):
     """Inicia o servidor para receber mensagens de clientes."""
+
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
     try:
+        exibir_segunda_janela()
         server.bind((host, port))
         server.listen(5) # Aceita até 5 conexões pendentes
         print(f"[INFO] Servidor iniciado em {host}:{port}")
