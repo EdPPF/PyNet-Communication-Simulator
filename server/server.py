@@ -23,6 +23,20 @@ def handle_client(client_socket, address):
         while True:
             # Recebe mensagem do cliente
             message = client_socket.recv(4194304).decode()
+
+            if message == "start":
+                # Começa array de mensagem
+                pass
+            elif message == "stop":
+                # Termina array de mensagem
+                # Próxima mensagem recebida é protocol_config
+                pass
+            else:
+                # Adiciona recebido ao array de mensagem
+                pass
+            
+            # Após receber protocol_config, processa a mensagem
+
             if not message:
                 break
             print(f"Sinal recebido.")

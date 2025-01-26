@@ -126,6 +126,15 @@ def process_message(message: str):
     }
     return modulated_message, protocol_config
 
+def split_message(input_list, chunk_size):
+    """Split a list into chunks of a specified size."""
+    messages = []
+    for i in range(0, len(input_list), chunk_size):
+        if chunk_size > len(input_list[i:]):
+            chunk_size = len(input_list[i:])
+        messages.append(input_list[i:i + chunk_size])
+
+    return messages
 
 def start(host=common.constants.Host, port=common.constants.Port):
     """Inicia o cliente para enviar mensagens a um servidor."""
@@ -145,7 +154,11 @@ def start(host=common.constants.Host, port=common.constants.Port):
             processed_message, protocol_config = process_message(message)
             # Envia mensagem ao servidor
 
-            client.sendall(str((processed_message, protocol_config)).encode())
+            client.sendall("start".encode())
+            for package in split_message(processed_message, 1024):
+                client.sendall(str(package).encode())
+
+            client.sendall("stop".encode())
 
             # Recebe resposta do servidor
             response = client.recv(1024).decode()
