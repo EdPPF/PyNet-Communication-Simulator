@@ -1,6 +1,7 @@
 import socket
 import threading
 import common.constants
+from common.conversions import bytes_to_bits, bits_to_bytes
 
 from link_layer.framing.byte_insertion import byte_insertion
 from link_layer.framing.char_count import char_count
@@ -19,6 +20,7 @@ from physical_layer.carrier_modulation.qam8 import qam8_modulation
 def process_message(message: str):
     # Modifica message para list[int] para aplicar enquadramento
     data = [ord(char) for char in message]
+    print(data)
 
     # 1. Enquadramento
     while True:
@@ -36,6 +38,8 @@ def process_message(message: str):
             break
         else:
             print("Escolha inválida. Por favor, escolha novamente.")
+
+    print(framed_message)
 
     # 2. Detecção de erros
     while True:
@@ -56,9 +60,13 @@ def process_message(message: str):
     # error_checked_message: list[int]
     print(f"error_checked_message: {error_checked_message}")
 
+    bits = bytes_to_bits(error_checked_message)
+    
     # 3. Correção de erros - Hamming(7,4)
-    encoded_message = encode_hamming(error_checked_message)
+    encoded_message = encode_hamming(bits)
     # encoded_message: list[int]
+
+    print(encoded_message)
 
     # 4. Modulação Banda Base
     while True:
@@ -80,6 +88,8 @@ def process_message(message: str):
             break
         else:
             print("Escolha inválida. Por favor, escolha novamente.")
+
+    print(modulated_message)
 
     # 5. Modulação de Portadora
     freq0 = 0
@@ -110,6 +120,9 @@ def process_message(message: str):
             break
         else:
             print("Escolha inválida. Por favor, escolha novamente.")
+
+    print(modulated_message)
+    modulated_message = bits_to_bytes(modulated_message)
 
     # Retorna a mensagem modulada e a configuração de protocolos
     protocol_config = {
@@ -142,6 +155,8 @@ def start(host=common.constants.Host, port=common.constants.Port):
             # Processa a mensagem com os protocolos
             processed_message, protocol_config = process_message(message)
             # Envia mensagem ao servidor
+
+            print("sobra da divisão por 8: ", len(processed_message) % 8)
             client.sendall(str((processed_message, protocol_config)).encode())
 
             # Recebe resposta do servidor

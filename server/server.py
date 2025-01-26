@@ -1,6 +1,7 @@
 import socket
 import threading
 import common.constants
+from common.conversions import bytes_to_bits, bits_to_bytes
 
 from link_layer.framing.byte_insertion import byte_removal
 from link_layer.framing.char_count import char_remove
@@ -29,6 +30,10 @@ def handle_client(client_socket, address):
             modulated_data, protocol_config = eval(message) # Deserializa a mensagem
             # modulated_data: list[float]
 
+            print(modulated_data)
+
+            modulated_data = bytes_to_bits(modulated_data)
+
             # 1. Undo modulação de portadora
             if protocol_config["carrier"] == "ask":
                 baseband_data = ask_demodulation(modulated_data, protocol_config["threshold"])
@@ -38,20 +43,27 @@ def handle_client(client_socket, address):
                 baseband_data = qam8_demodulation(modulated_data, protocol_config["amplitude"])
             # baseband_data: list[int]
 
+            print(baseband_data)
+
             # 2. Undo modulação de banda base
             if protocol_config["baseband"] == "polar_nrz":
                 data = demodulate_polar_nrz(baseband_data)
-                print("NRZ Polar OK")
             elif protocol_config["baseband"] == "bipolar_nrz":
                 data = demodulate_bipolar_nrz(baseband_data)
             elif protocol_config["baseband"] == "manchester":
                 data = demodulate_manchester(baseband_data)
             # data: list[int]
 
+            print(data)
+
             # 3. Desfaz Hamming
             error_checked_message = decode_hamming(data)
             print("Hamming OK")
             # error_checked_message: list[int]
+
+            print(error_checked_message)
+
+            error_checked_message = bits_to_bytes(error_checked_message)
 
             # 4. Verifica detecção de erros
             if protocol_config["error_detection"] == "parity_bit":
