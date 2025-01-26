@@ -18,6 +18,13 @@ def main():
     # print("2 - Iniciar Cliente")
     # option = input("Opção: ")
 
+    def iniciar_servidor():
+        root.destroy()  # Fecha a janela principal
+        start_server()  # Inicia o servidor
+
+    def iniciar_cliente():
+        root.destroy()  # Fecha a janela principal
+        start_client()  # Inicia o cliente
 
     root = tk.Tk()
     root.title("Menu")
@@ -25,8 +32,8 @@ def main():
 
     tk.Label(root, text="Selecione uma opção:").pack(pady=10)
 
-    tk.Button(root, text="1 - Iniciar Servidor", command=start_server).pack(pady=10)
-    tk.Button(root, text="2 - Iniciar Cliente", command=start_client).pack(pady=10)
+    tk.Button(root, text="1 - Iniciar Servidor", command=iniciar_servidor).pack(pady=10)
+    tk.Button(root, text="2 - Iniciar Cliente", command=iniciar_cliente).pack(pady=10)
 
     root.mainloop()
 
