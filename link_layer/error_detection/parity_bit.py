@@ -19,20 +19,3 @@ def verify_parity_bit(frame: list[int]) -> tuple[list[int], bool]:
     is_valid = (computed_parity == parity_bit)
 
     return data, is_valid
-
-
-def main():
-    message = "hi" # [2, 104, 105, 3] por byte insertion
-    data = [2, 104, 105, 3]
-    print(f"Original Data: {data}")
-    framed_data = compute_parity_bit(data)
-    print(f"Framed Data  : {framed_data}")
-
-    data, is_valid = verify_parity_bit(framed_data)
-    print(f"Unframed Data: {data}")
-    message = "".join([chr(byte) for byte in data])
-    print(f"Message      : {message}")
-    print(f"Is Valid     : {is_valid}")
-
-if __name__ == "__main__":
-    main()
