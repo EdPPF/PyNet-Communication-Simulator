@@ -1,30 +1,40 @@
 import tkinter as tk
-from servidor_gui import exibir_segunda_janela  # Importa a função da outra janela
+from typing import Callable
 
-def criar_janela_principal():
-    # Criação da janela principal
-    root = tk.Tk()
-    root.title("CLIENTE")
+class ClientGUI:
+    def __init__(self, message_callback: Callable[[str], None]):
+        self.root = tk.Tk()
+        self.root.title("CLIENTE")
+        self.message_callback = message_callback
+        self.setup_gui()
 
-    # Criação do campo de entrada de texto
+    def setup_gui(self):
+        # Entry label
+        entry_label = tk.Label(self.root, text="Digite uma mensagem ou 'sair' para encerrar: ")
+        entry_label.pack(pady=10)
 
-    entry_label = tk.Label(root, text="Digite uma mensagem ou 'sair' para encerrar: ")
-    entry_label.pack(pady=10)
+        # Entry field
+        self.entry = tk.Entry(self.root)
+        self.entry.pack(pady=10)
+        
+        # Send button
+        button = tk.Button(self.root, text="Enviar", command=self.enviar_dados)
+        button.pack(pady=20)
 
-    entry = tk.Entry(root)
-    entry.pack(pady=10)
+        # Bind Enter key to send message
+        self.entry.bind('<Return>', lambda event: self.enviar_dados())
 
-    # Função que é chamada quando o botão "Enviar" é pressionado
-    def enviar_dados():
-        dado = entry.get()  # Pega o dado digitado
-        return dado
-        #exibir_segunda_janela(dado)  # Chama a função que exibe a segunda janela
+    def enviar_dados(self):
+        dado = self.entry.get()  # Get the entered text
+        self.entry.delete(0, tk.END)  # Clear the entry field
+        if self.message_callback:
+            self.message_callback(dado)  # Call the callback function with the message
+        
+        if dado.lower() == 'sair':
+            self.root.quit()
 
-    # Criação do botão "Enviar"
-    button = tk.Button(root, text="Enviar", command=enviar_dados)
-    button.pack(pady=20)
-    
-    # Iniciar o loop da interface gráfica
-    root.mainloop()
-def fechar_janela(): 
-    root.destroy()
+    def start(self):
+        self.root.mainloop()
+
+    def close(self):
+        self.root.destroy()
